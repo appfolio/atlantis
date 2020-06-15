@@ -41,6 +41,7 @@ func TestNewGlobalCfg(t *testing.T) {
 				IDRegex:              regexp.MustCompile(".*"),
 				ApplyRequirements:    []string{},
 				Workflow:             &expDefaultWorkflow,
+				AllowedWorkflows:     []string{},
 				AllowedOverrides:     []string{},
 				AllowCustomWorkflows: Bool(false),
 			},

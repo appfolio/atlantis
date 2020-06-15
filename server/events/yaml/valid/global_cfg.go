@@ -253,10 +253,7 @@ func (g GlobalCfg) ValidateRepoCfg(rCfg RepoCfg, repoID string) error {
 		return fmt.Errorf("repo config not allowed to define custom workflows: server-side config needs '%s: true'", AllowCustomWorkflowsKey)
 	}
 
-	// TODO:MARC
-	// Check workflow is approved
-	// Move after allowed overrides
-	// This only works with 1 project
+	// Check workflow is allowed
 	var allowedWorkflows []string
 	for _, repo := range g.Repos {
 		if repo.IDMatches(repoID) {
@@ -266,23 +263,14 @@ func (g GlobalCfg) ValidateRepoCfg(rCfg RepoCfg, repoID string) error {
 		}
 	}
 
-	// Just print the allowed workflows for this repo
-	// fmt.Println(approvedWorkflows)
-
-	fmt.Println("Allowed workflows for repo are: ", strings.Join(allowedWorkflows, ", "))
-
-	var forbidden string
+	// Verify all allowedWorkflows
 	for _, p := range rCfg.Projects {
-		// Verify all approvedWorkflows
-		fmt.Println("verifying that", *p.WorkflowName, "is approved.")
-
-		for _, w := range allowedWorkflows {
-			if *p.WorkflowName == w {
-				break
-			} else {
-
-				forbidden = *p.WorkflowName
-				return fmt.Errorf("workflow '%s' is not allowed for repo", forbidden)
+		fmt.Println(allowedWorkflows)
+		// default is always allowed
+		if p.WorkflowName != nil && allowedWorkflows != nil {
+			name := *p.WorkflowName
+			if !sliceContainsF(allowedWorkflows, name) {
+				return fmt.Errorf("workflow '%s' is not allowed for this repo", name)
 			}
 		}
 	}
